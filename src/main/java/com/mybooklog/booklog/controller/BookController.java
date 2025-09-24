@@ -1,4 +1,4 @@
-package com.mybooklog.booklog;
+package com.mybooklog.booklog.controller;
 
 import com.mybooklog.booklog.domain.Book;
 import com.mybooklog.booklog.repository.BookRepository;
