@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http//www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>나의 서재</title>
@@ -19,7 +19,9 @@
         <tbody>
             <tr th:each="book : ${books}">
                 <td th:text="${book.id}">1</td>
-                <td th:text="${book.title}">책 제목 예시</td>
+                <td>
+                    <a th:href="@{/books/{id}(id=${book.id})}" th:text="${book.title}">책 제목 예시</a>
+                </td>
                 <td th:text="${book.author}">저자 예시</td>
             </tr>
         </tbody>

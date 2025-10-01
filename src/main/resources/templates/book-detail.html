@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>책 상세 정보</title>
+</head>
+<body>
+    <h1>책 상세 정보</h1>
+    <div th:object="${book}">
+        <p><strong>ID:</strong> <span th:text="*{id}">1</span></p>
+        <p><strong>제목:</strong> <span th:text="*{title}">책 제목</span></p>
+        <p><strong>저자:</strong> <span th:text="*{author}">저자</span></p>
+    </div>
+    <a th:href="@{/books/{id}/edit(id=${book.id})}">수정하기</a> <a href="/books">목록으로 돌아가기</a>
+
+    <form th:action="@{/books/{id}/delete(id=${book.id})}" method="post" style="display:inline;">
+        <button type="submit" onclick="return confirm('정말로 삭제하시겠습니까?');">삭제하기</button>
+    </form>
+</body>
+</html>
