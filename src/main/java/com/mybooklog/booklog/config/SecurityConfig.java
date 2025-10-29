@@ -22,8 +22,9 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 // csrf 보호 기능을 비활성화합니다.
-                .csrf(csrf -> csrf.disable()) //
-
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/h2-console/**")
+                )
                 .headers(headers -> headers
                         .frameOptions(frameOptions -> frameOptions.disable())
                 )

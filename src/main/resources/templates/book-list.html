@@ -1,31 +1,27 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>나의 서재</title>
-</head>
+<head th:replace="~{fragments/header :: header-fragment}"></head>
 <body>
-    <h1>나의 서재 목록</h1>
-    <a href="/books/add">새 책 등록하기</a>
-
-    <table border="1">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>제목</th>
-                <th>저자</th>
-            </tr>
+<div th:replace="~{fragments/navbar :: navbar-fragment}"></div>
+<div class="container mt-5">
+    <h1 class="mb-4">나의 서재 목록</h1>
+    <a href="/books/add" class="btn btn-primary mb-3">새 책 등록하기</a>
+    <table class="table table-hover">
+        <thead class="table-dark">
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">제목</th>
+            <th scope="col">저자</th>
+        </tr>
         </thead>
         <tbody>
-            <tr th:each="book : ${books}">
-                <td th:text="${book.id}">1</td>
-                <td>
-                    <a th:href="@{/books/{id}(id=${book.id})}" th:text="${book.title}">책 제목 예시</a>
-                </td>
-                <td th:text="${book.author}">저자 예시</td>
-            </tr>
+        <tr th:each="book : ${books}">
+            <th scope="row" th:text="${book.id}">1</th>
+            <td><a th:href="@{/books/{id}(id=${book.id})}" th:text="${book.title}">책 제목</a></td>
+            <td th:text="${book.author}">저자</td>
+        </tr>
         </tbody>
     </table>
+</div>
 </body>
 </html>
-

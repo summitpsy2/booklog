@@ -1,20 +1,27 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>책 상세 정보</title>
-</head>
+<head th:replace="~{fragments/header :: header-fragment}"></head>
 <body>
-    <h1>책 상세 정보</h1>
-    <div th:object="${book}">
-        <p><strong>ID:</strong> <span th:text="*{id}">1</span></p>
-        <p><strong>제목:</strong> <span th:text="*{title}">책 제목</span></p>
-        <p><strong>저자:</strong> <span th:text="*{author}">저자</span></p>
-    </div>
-    <a th:href="@{/books/{id}/edit(id=${book.id})}">수정하기</a> <a href="/books">목록으로 돌아가기</a>
+<div th:replace="~{fragments/navbar :: navbar-fragment}"></div>
 
-    <form th:action="@{/books/{id}/delete(id=${book.id})}" method="post" style="display:inline;">
-        <button type="submit" onclick="return confirm('정말로 삭제하시겠습니까?');">삭제하기</button>
-    </form>
+<div class="container mt-5">
+    <h1>책 상세 정보</h1>
+    <div th:object="${book}" class="card mt-4">
+        <div class="card-body">
+            <h5 class="card-title" th:text="*{title}">책 제목</h5>
+            <h6 class="card-subtitle mb-2 text-muted" th:text="*{author}">저자</h6>
+            <p class="card-text">ID: <span th:text="*{id}">1</span></p>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a th:href="@{/books/{id}/edit(id=${book.id})}" class="btn btn-warning">수정하기</a>
+        <form th:action="@{/books/{id}/delete(id=${book.id})}" method="post" class="d-inline">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit" onclick="return confirm('정말로 삭제하시겠습니까?');" class="btn btn-danger">삭제하기</button>
+        </form>
+        <a href="/books" class="btn btn-secondary">목록으로 돌아가기</a>
+    </div>
+</div>
 </body>
 </html>
