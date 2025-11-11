@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<!-- 머리글(타이틀/메타/스타일 로드) -->
+<head th:replace="~{fragments/header :: head('BookLog - 나만의 서재')}"></head>
+
+<body>
+<!-- 네비게이션바 -->
+<header th:replace="~{fragments/header :: navbar}"></header>
+
+<!-- Hero Section -->
+<section class="py-5">
+    <div class="container-narrow">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-7">
+                <h1 class="display-5 fw-bold">나만의 서재를 <span style="color:var(--brand)">세련되게</span> 관리하세요</h1>
+                <p class="lead mt-3">
+                    사용자별 로컬 번호, 나만의 서평, 관리자 도구까지.
+                    운영 서비스 수준의 디자인과 구조로, 수업 과제 이상의 결과물을 만듭니다.
+                </p>
+                <div class="mt-4 d-flex gap-2">
+                    <a class="btn btn-brand btn-lg" href="/signup"><i class="bi bi-rocket-takeoff me-2"></i>지금 시작하기</a>
+                    <a class="btn btn-outline-secondary btn-lg" href="/books"><i class="bi bi-journal-text me-2"></i>내 서재 보기</a>
+                </div>
+                <p class="text-muted mt-2">🌓 우측 상단 버튼으로 다크모드를 전환해보세요.</p>
+            </div>
+            <div class="col-lg-5">
+                <div class="bl-card">
+                    <div class="bl-card-header">
+                        <small class="text-muted">미리보기</small>
+                    </div>
+                    <div class="bl-card-body">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <div class="fw-semibold">#1 클린 코드</div>
+                                <div class="text-muted">로버트 C. 마틴</div>
+                            </div>
+                            <span class="badge text-bg-primary rounded-pill">★ ★ ★ ★ ☆</span>
+                        </div>
+                        <div class="bl-divider"></div>
+                        <p class="mb-0 text-muted">
+                            리뷰: 좋은 코드의 기준을 다시 생각하게 해 준다.
+                            변하지 않는 원칙에 집중할 것.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- row -->
+    </div>
+</section>
+
+<!-- Feature Cards -->
+<section class="py-4" style="background:var(--surface-2)">
+    <div class="container-narrow">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="bl-card h-100">
+                    <div class="bl-card-body">
+                        <h5 class="mb-1"><i class="bi bi-hash me-2"></i>사용자별 로컬 번호</h5>
+                        <p class="text-muted mb-0">/books/1 이 사용자마다 다른 책을 의미하도록 설계. “나만의” 컨셉을 URL부터 보장.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="bl-card h-100">
+                    <div class="bl-card-body">
+                        <h5 class="mb-1"><i class="bi bi-stars me-2"></i>나만의 서평</h5>
+                        <p class="text-muted mb-0">별점(1–5) + 한줄 코멘트. 심플하지만 강력한 기록 경험.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="bl-card h-100">
+                    <div class="bl-card-body">
+                        <h5 class="mb-1"><i class="bi bi-shield-lock me-2"></i>관리자 도구</h5>
+                        <p class="text-muted mb-0">/admin 전용 화면. 사용자/책/리뷰 집계 및 관리 기능(후속 주차).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 푸터 -->
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>

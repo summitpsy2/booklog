@@ -1,0 +1,176 @@
+/* === Brand & Theme Tokens =============================================== */
+:root {
+  --brand: #5b8def;            /* 메인 브랜드 컬러 */
+  --brand-600: #3a6fe6;        /* hover/active */
+  --text: #1d232a;             /* 본문 텍스트 */
+  --muted: #6b7280;            /* 보조 텍스트 */
+  --surface: #ffffff;          /* 카드/배경 */
+  --surface-2: #f8fafc;        /* 섹션 배경 */
+  --border: rgba(0,0,0,.08);   /* 테두리 */
+  --ring: rgba(91,141,239,.35);/* 포커스 링 */
+
+  --radius: 14px;              /* 라운드 정도 (전역) */
+  --shadow: 0 8px 24px rgba(0,0,0,.06);
+}
+
+/* 다크모드 토큰: data-theme="dark" 에서만 바뀜 */
+:root[data-theme="dark"] {
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+  --surface: #0f141b;
+  --surface-2: #0b0f14;
+  --border: rgba(255,255,255,.08);
+  --ring: rgba(91,141,239,.45);
+  --shadow: 0 8px 24px rgba(0,0,0,.45);
+}
+
+/* === Base ================================================================ */
+html, body {
+  height: 100%;
+}
+body {
+  color: var(--text);
+  background: linear-gradient(180deg, var(--surface-2), var(--surface));
+  -webkit-font-smoothing: antialiased;  /* 글자 렌더링 개선 */
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 컨테이너 폭 최적화 */
+.container-narrow {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+/* === Typography ========================================================== */
+h1, .h1 { font-weight: 800; letter-spacing: -0.02em; }
+h2, .h2 { font-weight: 700; letter-spacing: -0.02em; }
+.lead { color: var(--muted); }
+
+/* === Navbar =============================================================== */
+.navbar-bl {
+  backdrop-filter: saturate(120%) blur(6px);
+  background: color-mix(in srgb, var(--surface), transparent 8%);
+  border-bottom: 1px solid var(--border);
+}
+.navbar-brand strong { letter-spacing: -0.02em; }
+
+/* Navbar 링크 색상 (다크/라이트 모드 동시 적용) */
+.navbar-bl .navbar-brand,
+.navbar-bl .nav-link {
+  color: var(--text); /* 테마의 기본 글자색을 따르도록 함 */
+  transition: color .15s ease;
+}
+/* Navbar 링크 호버 및 활성화(active) 색상 */
+.navbar-bl .nav-link:hover,
+.navbar-bl .navbar-brand:hover,
+.navbar-bl .nav-link.active {
+  color: var(--brand); /* 호버 또는 active 시 브랜드 색상으로 변경 */
+}
+
+
+/* === Cards ================================================================ */
+.bl-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.bl-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0,0,0,.10);
+}
+.bl-card .bl-card-header {
+  padding: 16px 18px 0 18px;
+}
+.bl-card .bl-card-body {
+  padding: 18px;
+}
+.bl-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 12px 0;
+}
+
+/* === Buttons ============================================================== */
+.btn-brand {
+  --bs-btn-bg: var(--brand);
+  --bs-btn-border-color: var(--brand);
+  --bs-btn-hover-bg: var(--brand-600);
+  --bs-btn-hover-border-color: var(--brand-600);
+  --bs-btn-focus-shadow-rgb: 91,141,239;
+  color: #fff;
+  border-radius: calc(var(--radius) - 6px);
+  box-shadow: 0 6px 14px rgba(91,141,239,.25);
+}
+
+/* === Forms ================================================================ */
+.form-control, .form-select, textarea {
+  border-radius: calc(var(--radius) - 6px) !important;
+  border-color: var(--border) !important;
+  background: var(--surface) !important;
+  color: var(--text) !important;
+}
+.form-control:focus, .form-select:focus, textarea:focus {
+  box-shadow: 0 0 0 .25rem var(--ring) !important;
+  border-color: var(--brand-600) !impo
+
+rtant;
+}
+
+/* [수정됨] 다크 모드일 때 폼 플레이스홀더(미리보기 글자) 색상 */
+:root[data-theme="dark"] .form-control::placeholder {
+  color: var(--muted);
+}
+
+/* === [ 7주차 수정 ] Pagination Dark Mode === */
+:root[data-theme="dark"] .page-link {
+  background-color: var(--surface);
+  color: var(--muted);
+  border-color: var(--border);
+}
+:root[data-theme="dark"] .page-link:hover {
+  background-color: var(--surface-2);
+  color: var(--brand);
+}
+:root[data-theme="dark"] .page-item.active .page-link {
+  background-color: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
+:root[data-theme="dark"] .page-item.disabled .page-link {
+  background-color: var(--surface-2);
+  color: var(--muted);
+  border-color: var(--border);
+}
+
+/* === Alert / Toast ======================================================== */
+.bl-alert {
+  border-radius: calc(var(--radius) - 6px);
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--brand), var(--surface) 92%);
+  color: var(--text);
+}
+
+/* === Footer =============================================================== */
+.footer-bl {
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+/* Utility */
+.text-muted { color: var(--muted) !important; }
+
+/* === [ 4주차 수정 ] 테이블 다크 모드 === */
+:root[data-theme="dark"] .table {
+  --bs-table-bg: var(--surface);
+  --bs-table-color: var(--text);
+  --bs-table-border-color: var(--border);
+  --bs-table-hover-bg: var(--surface-2);
+}
+:root[data-theme="dark"] .table-dark {
+  --bs-table-bg: var(--surface-2);
+  --bs-table-color: var(--text);
+  --bs-table-border-color: var(--border);
+}

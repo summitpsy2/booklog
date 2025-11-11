@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head th:replace="~{fragments/header :: head('내 책 목록 - BookLog')}"></head>
+<body>
+<header th:replace="~{fragments/header :: navbar}"></header>
+
+<main class="container-narrow py-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">내 책 목록</h1>
+        <a class="btn btn-brand" th:href="@{/books/add}"><i class="bi bi-plus-lg me-1"></i>새 책 등록</a>
+    </div>
+
+    <!-- 알림 메시지 (삭제, 등록 시) -->
+    <div class="alert bl-alert mb-3" th:if="${msg != null}">
+        <i class="bi bi-info-circle me-2"></i><span th:text="${msg}">안내</span>
+    </div>
+
+    <!-- 검색 폼 -->
+    <form method="get" th:action="@{/books}" class="row g-2 mb-4">
+        <div class="col-sm-8 col-md-9">
+            <input class="form-control" type="text" name="keyword" th:value="${keyword}" placeholder="제목으로 검색"/>
+        </div>
+        <div class="col-sm-4 col-md-3 d-grid d-sm-flex gap-2">
+            <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search me-1"></i>검색</button>
+            <a class="btn btn-outline-secondary" th:href="@{/books}">초기화</a>
+        </div>
+    </form>
+
+    <!-- 책 목록 -->
+    <div class="table-responsive bl-card">
+        <table class="table align-middle mb-0">
+            <thead>
+            <tr>
+                <th style="width:90px;">번호</th>
+                <th>제목</th>
+                <th style="width:30%;">저자</th>
+                <th style="width:120px;"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- [수정됨] 템플릿 변수를 "bookPage"로 통일 -->
+            <tr th:each="b : ${bookPage.content}">
+                <td class="text-muted">#<span th:text="${b.no}">1</span></td>
+                <td>
+                    <a th:href="@{|/books/${b.no}|}" class="text-decoration-none fw-semibold" th:text="${b.title}">제목</a>
+                </td>
+                <td th:text="${b.author}">저자</td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-secondary" th:href="@{|/books/${b.no}|}"><i class="bi bi-eye"></i></a>
+                    <a class="btn btn-sm btn-outline-secondary" th:href="@{|/books/${b.no}/edit|}"><i class="bi bi-pencil"></i></a>
+                </td>
+            </tr>
+            <!-- [수정됨] 템플릿 변수를 "bookPage"로 통일 -->
+            <tr th:if="${bookPage.content.isEmpty()}">
+                <td colspan="4" class="text-center text-muted py-4">등록된 책이 없습니다. 우측 상단의 <b>새 책 등록</b>을 눌러보세요.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- [수정됨] 템플릿 변수를 "bookPage"로 통일 (2페이지 버그 수정 포함) -->
+    <nav class="mt-3" th:if="${bookPage.totalPages > 1}">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${bookPage.first} ? 'disabled'">
+                <a class="page-link" th:href="@{/books(page=${bookPage.number - 1}, keyword=${keyword != null ? keyword : ''})}">&laquo;</a>
+            </li>
+            <li class="page-item"
+                th:each="p : ${#numbers.sequence(0, bookPage.totalPages - 1)}"
+                th:classappend="${p} == ${bookPage.number} ? 'active'">
+                <a class="page-link" th:text="${p+1}"
+                   th:href="@{/books(page=${p}, keyword=${keyword != null ? keyword : ''})}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${bookPage.last} ? 'disabled'">
+                <a class="page-link" th:href="@{/books(page=${bookPage.number + 1}, keyword=${keyword != null ? keyword : ''})}">&raquo;</a>
+            </li>
+        </ul>
+    </nav>
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>
