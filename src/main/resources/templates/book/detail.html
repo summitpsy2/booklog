@@ -1,25 +1,41 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<html xmlns:th="http://www.thymeleaf.org" lang="ko" data-theme="dark">
 <head th:replace="~{fragments/header :: head('책 상세 - BookLog')}"></head>
 <body>
 <header th:replace="~{fragments/header :: navbar}"></header>
 
 <main class="container-narrow py-5">
-    <!-- [수정됨] book.id -> book.no (원래대로) -->
+    <!-- 플래시 메시지 -->
+    <div class="alert bl-alert mb-3" th:if="${msg != null}">
+        <i class="bi bi-info-circle me-2"></i>
+        <span th:text="${msg}">안내</span>
+    </div>
+
+    <!-- 제목 + 수정/삭제 버튼 -->
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h3 mb-0">
-            <span class="text-muted">#</span><span th:text="${book.no}">1</span>
-            <span th:text="${book.title}">제목</span>
+            <span class="text-muted">#</span>
+            <span th:text="${book.no}">1</span>
+            <span class="ms-2" th:text="${book.title}">책 제목</span>
         </h1>
+
         <div class="d-flex gap-2">
-            <a class="btn btn-outline-secondary" th:href="@{|/books/${book.no}/edit|}"><i class="bi bi-pencil me-1"></i>수정</a>
-            <form th:action="@{|/books/${book.no}/delete|}" method="post" onsubmit="return confirm('삭제하시겠습니까?');">
+            <a class="btn btn-outline-secondary" th:href="@{|/books/${book.no}/edit|}">
+                <i class="bi bi-pencil me-1"></i>수정
+            </a>
+
+            <form th:action="@{|/books/${book.no}/delete|}"
+                  method="post"
+                  onsubmit="return confirm('책을 삭제하시겠습니까?');">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                <button class="btn btn-outline-danger" type="submit"><i class="bi bi-trash me-1"></i>삭제</button>
+                <button class="btn btn-outline-danger">
+                    <i class="bi bi-trash me-1"></i>삭제
+                </button>
             </form>
         </div>
     </div>
 
+    <!-- 책 정보 -->
     <div class="bl-card mb-4">
         <div class="bl-card-body">
             <div class="mb-1 text-muted">저자</div>
@@ -27,11 +43,333 @@
         </div>
     </div>
 
-    <div class="d-flex gap-2">
-        <a class="btn btn-outline-secondary" th:href="@{/books}"><i class="bi bi-arrow-left"></i> 목록으로</a>
+    <!-- 나의 서평 -->
+    <section class="mb-4">
+        <h2 class="h5 mb-3"><i class="bi bi-pencil-square me-1"></i>나의 서평</h2>
+
+        <!-- ============================= -->
+        <!--   (1) REVIEW CREATE MODE       -->
+        <!-- ============================= -->
+        <div class="bl-card" th:if="${!hasMyReview}">
+            <div class="bl-card-body">
+                <form id="reviewCreateForm"
+                      th:action="@{|/books/${book.no}/reviews|}"
+                      method="post"
+                      th:object="${newReview}">
+
+                    <input type="hidden"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}"/>
+
+                    <div class="row g-3">
+
+                        <!-- 별점 선택 -->
+                        <div class="col-sm-3">
+                            <label class="form-label">별점</label>
+                            <div id="createRatingStars" class="d-flex gap-1">
+                                <input type="hidden" id="rating" th:field="*{rating}"/>
+
+                                <button type="button" class="btn btn-link p-0 fs-4 star-btn" data-value="1"><i class="bi bi-star"></i></button>
+                                <button type="button" class="btn btn-link p-0 fs-4 star-btn" data-value="2"><i class="bi bi-star"></i></button>
+                                <button type="button" class="btn btn-link p-0 fs-4 star-btn" data-value="3"><i class="bi bi-star"></i></button>
+                                <button type="button" class="btn btn-link p-0 fs-4 star-btn" data-value="4"><i class="bi bi-star"></i></button>
+                                <button type="button" class="btn btn-link p-0 fs-4 star-btn" data-value="5"><i class="bi bi-star"></i></button>
+                            </div>
+
+                            <div class="text-danger mt-1"
+                                 th:if="${#fields.hasErrors('rating')}"
+                                 th:errors="*{rating}"></div>
+                        </div>
+
+                        <!-- 코멘트 -->
+                        <div class="col-sm-9">
+                            <label class="form-label">코멘트</label>
+                            <div id="editor"></div>
+                            <textarea id="comment" th:field="*{comment}" style="display:none;"></textarea>
+
+                            <div class="text-danger mt-1"
+                                 th:if="${#fields.hasErrors('comment')}"
+                                 th:errors="*{comment}"></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <button class="btn btn-brand"><i class="bi bi-send me-1"></i>등록</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ============================= -->
+        <!--   (2) REVIEW VIEW MODE         -->
+        <!-- ============================= -->
+        <div class="bl-card" id="myReviewViewCard" th:if="${hasMyReview}">
+            <div class="bl-card-body">
+
+                <!-- 상단: 별점 + 수정/삭제 -->
+                <div class="d-flex justify-content-between">
+                    <div class="d-flex align-items-center gap-2">
+                        <div>
+                            <i th:each="n : ${new int[]{1,2,3,4,5}}"
+                               class="bi fs-4"
+                               th:classappend="${n <= myReview.rating} ? ' bi-star-fill text-warning' : ' bi-star text-warning'">
+                            </i>
+                        </div>
+
+                        <span class="fw-semibold" th:text="|${myReview.rating} / 5|">4 / 5</span>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button id="myReviewEditBtn" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-pencil me-1"></i>수정
+                        </button>
+
+                        <form th:action="@{|/reviews/${myReviewId}/delete|}"
+                              method="post"
+                              onsubmit="return confirm('리뷰를 삭제하시겠습니까?');">
+
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                            <input type="hidden" name="bookNo" th:value="${book.no}"/>
+
+                            <button class="btn btn-outline-danger btn-sm">
+                                <i class="bi bi-trash me-1"></i>삭제
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <hr class="my-3">
+
+                <!-- 코멘트 표시 (Viewer) -->
+                <div class="d-flex">
+                    <div class="me-3 text-warning">
+                        <i class="bi bi-chat-quote fs-3"></i>
+                    </div>
+
+                    <div id="myReviewViewer"
+                         class="tui-editor-contents bl-review-content"
+                         th:attr="data-comment=${myReview.comment}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================= -->
+        <!--   (3) REVIEW EDIT MODE         -->
+        <!-- ============================= -->
+        <div class="bl-card d-none" id="myReviewEditCard" th:if="${hasMyReview}">
+            <div class="bl-card-body">
+
+                <form id="reviewUpdateForm"
+                      th:action="@{|/reviews/${myReviewId}/edit|}"
+                      method="post"
+                      th:object="${myReview}">
+
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <input type="hidden" name="bookNo" th:value="${book.no}"/>
+
+                    <div class="row g-3">
+
+                        <!-- 수정 시 별점 선택 -->
+                        <div class="col-sm-3">
+                            <label class="form-label">별점</label>
+
+                            <div id="editRatingStars" class="d-flex gap-1">
+                                <input type="hidden" id="editRatingInput" th:field="*{rating}"/>
+
+                                <button type="button" class="btn btn-link p-0 fs-4 star-btn" data-value="1"><i class="bi bi-star"></i></button>
+                                <button type="button" class="btn btn-link p-0 fs-4 star-btn" data-value="2"><i class="bi bi-star"></i></button>
+                                <button type="button" class="btn btn-link p-0 fs-4 star-btn" data-value="3"><i class="bi bi-star"></i></button>
+                                <button type="button" class="btn btn-link p-0 fs-4 star-btn" data-value="4"><i class="bi bi-star"></i></button>
+                                <button type="button" class="btn btn-link p-0 fs-4 star-btn" data-value="5"><i class="bi bi-star"></i></button>
+                            </div>
+
+                            <div class="text-danger mt-1"
+                                 th:if="${#fields.hasErrors('rating')}"
+                                 th:errors="*{rating}"></div>
+                        </div>
+
+                        <!-- 수정 코멘트 -->
+                        <div class="col-sm-9">
+                            <label class="form-label">코멘트</label>
+
+                            <div id="editEditor"></div>
+                            <textarea id="editComment"
+                                      th:field="*{comment}"
+                                      style="display:none;"></textarea>
+
+                            <div class="text-danger mt-1"
+                                 th:if="${#fields.hasErrors('comment')}"
+                                 th:errors="*{comment}"></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 d-flex gap-2">
+                        <button class="btn btn-brand">
+                            <i class="bi bi-check-lg me-1"></i>수정 완료
+                        </button>
+
+                        <button type="button" id="myReviewCancelBtn" class="btn btn-outline-secondary">
+                            취소
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <div class="mt-4">
+        <a class="btn btn-outline-secondary" th:href="@{/books}">
+            <i class="bi bi-arrow-left"></i> 목록으로
+        </a>
     </div>
 </main>
 
 <footer th:replace="~{fragments/footer :: footer}"></footer>
+
+<!-- ============================= -->
+<!--          STYLE FIX            -->
+<!-- ============================= -->
+<style>
+    /* 리뷰 텍스트 기본 스타일 */
+    .bl-review-content {
+        font-size: 0.95rem;
+        line-height: 1.7;
+        word-break: break-word;
+    }
+
+    /* 다크 모드: 텍스트 완전 흰색 */
+    html[data-theme="dark"] .bl-review-content,
+    html[data-theme="dark"] .bl-review-content * {
+        color: #ffffff !important;
+        opacity: 1 !important;
+    }
+
+    /* 라이트 모드: 텍스트 완전 검정 */
+    html:not([data-theme="dark"]) .bl-review-content,
+    html:not([data-theme="dark"]) .bl-review-content * {
+        color: #000000 !important;
+        opacity: 1 !important;
+    }
+</style>
+
+<!-- ============================= -->
+<!--        SCRIPT LOGIC           -->
+<!-- ============================= -->
+<script th:inline="javascript">
+    /*<![CDATA[*/
+
+    /* Toast UI Editor toolbar */
+    const editorToolbar = [
+        ['heading', 'bold', 'italic', 'strike'],
+        ['hr', 'quote'],
+        ['ul', 'ol', 'task'],
+        ['table', 'link'],
+        ['code', 'codeblock']
+    ];
+
+    /* ---- CREATE MODE ---- */
+    if (document.querySelector('#editor')) {
+        const createEditor = new toastui.Editor({
+            el: document.querySelector('#editor'),
+            height: '200px',
+            initialEditType: 'wysiwyg',
+            previewStyle: 'vertical',
+            toolbarItems: editorToolbar
+        });
+
+        document.getElementById('reviewCreateForm')
+            .addEventListener('submit', () => {
+                document.getElementById('comment').value = createEditor.getMarkdown();
+            });
+    }
+
+    /* ---- STAR RATING COMMON LOGIC ---- */
+    function setupStarRating(containerId, hiddenId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        const hidden = document.getElementById(hiddenId);
+        const stars = container.querySelectorAll('.star-btn');
+
+        function refresh(value) {
+            stars.forEach(btn => {
+                const icon = btn.querySelector('i');
+                const val = Number(btn.dataset.value);
+                if (val <= value) {
+                    icon.classList.add('bi-star-fill', 'text-warning');
+                    icon.classList.remove('bi-star');
+                } else {
+                    icon.classList.add('bi-star');
+                    icon.classList.remove('bi-star-fill');
+                }
+            });
+        }
+
+        let current = Number(hidden.value || 5);
+        hidden.value = current;
+        refresh(current);
+
+        stars.forEach(btn => {
+            btn.addEventListener('click', () => {
+                hidden.value = btn.dataset.value;
+                refresh(hidden.value);
+            });
+        });
+    }
+
+    setupStarRating('createRatingStars', 'rating');
+    setupStarRating('editRatingStars', 'editRatingInput');
+
+    /* ---- VIEWER MODE ---- */
+    if (document.querySelector('#myReviewViewer')) {
+        const viewerEl = document.getElementById('myReviewViewer');
+        const text = viewerEl.dataset.comment || '';
+
+        toastui.Editor.factory({
+            el: viewerEl,
+            viewer: true,
+            initialValue: text
+        });
+    }
+
+    /* ---- EDIT MODE ---- */
+    if (document.querySelector('#editEditor')) {
+        const editTextarea = document.getElementById('editComment');
+
+        const editEditor = new toastui.Editor({
+            el: document.querySelector('#editEditor'),
+            height: '200px',
+            initialEditType: 'wysiwyg',
+            previewStyle: 'vertical',
+            initialValue: editTextarea.value,
+            toolbarItems: editorToolbar
+        });
+
+        document.getElementById('reviewUpdateForm')
+            .addEventListener('submit', () => {
+                editTextarea.value = editEditor.getMarkdown();
+            });
+
+        /* 보기 <-> 수정 토글 */
+        const viewCard = document.getElementById('myReviewViewCard');
+        const editCard = document.getElementById('myReviewEditCard');
+
+        document.getElementById('myReviewEditBtn')
+            .addEventListener('click', () => {
+                viewCard.classList.add('d-none');
+                editCard.classList.remove('d-none');
+            });
+
+        document.getElementById('myReviewCancelBtn')
+            .addEventListener('click', () => {
+                editCard.classList.add('d-none');
+                viewCard.classList.remove('d-none');
+            });
+    }
+
+    /*]]>*/
+</script>
+
 </body>
 </html>

@@ -63,7 +63,6 @@ public class BookService {
             // 2. 검색어가 없으면: 전체 목록 + 페이징
             bookPage = bookRepository.findByUserOrderByNoDesc(user, pageable);
         }
-
         // 3. Page<Book>을 Page<BookListResponseDto>로 변환하여 반환
         return bookPage.map(BookListResponseDto::new);
     }

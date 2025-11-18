@@ -4,8 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.UpdateTimestamp; // import
-import java.time.LocalDateTime; // import
+import org.hibernate.annotations.UpdateTimestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter @Setter
@@ -20,13 +20,13 @@ public class Review {
     @Column(nullable = false)
     private int rating; // 별점 (1~5)
 
-    @Column(length = 500)
-    private String comment; // 한줄평
+    // [수정됨] VARCHAR(500) 대신, 길이 제한이 없는 TEXT 타입으로 변경
+    @Column(columnDefinition = "TEXT")
+    private String comment; // 한줄평 (이제 긴 글 가능)
 
-    @UpdateTimestamp // 엔티티가 수정될 때마다 자동으로 시간 갱신
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    // --- 관계 설정 ---
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user; // 이 리뷰를 작성한 사용자
